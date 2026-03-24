@@ -10,7 +10,7 @@ export interface Transport {
   id: number;
   ref: string;          
   container: string;   
-  vehicle: string;      //Biển kiểm soát
+  vehicle: string;      
   eta?: string;         
 }
 
