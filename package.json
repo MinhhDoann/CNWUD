@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "mssql": "^12.2.1"
+  },
+  "devDependencies": {
+    "@types/mssql": "^9.1.9"
+  }
+}
