@@ -4,7 +4,7 @@ import {
   createContainer,
   updateContainer,
   deleteContainer,
-} from '../controllers/containerController';
+} from '../controllers/containersController';
 
 const router = Router();
 
