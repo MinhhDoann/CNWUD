@@ -2,24 +2,19 @@ import sql from 'mssql';
 
 const config: sql.config = {
   server: 'DESKTOP-IDO3K8B',
+  port: 1433,
   database: 'Doan2',
   authentication: {
     type: 'ntlm',
     options: {
       domain: 'DESKTOP-IDO3K8B',
-      userName: 'lenovo',
+      userName: 'Lenovo',
       password: '160820',
     },
   },
   options: {
-    instanceName: 'SQLEXPRESS',
     encrypt: false,
     trustServerCertificate: true,
-  },
-  pool: {
-    max: 10,
-    min: 0,
-    idleTimeoutMillis: 30000,
   },
   connectionTimeout: 30000,
   requestTimeout: 30000,
