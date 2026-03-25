@@ -8,10 +8,14 @@ export interface Container {
 
 export interface Transport {
   id: number;
-  ref: string;          
-  container: string;   
-  vehicle: string;      
-  eta?: string;         
+  ref: string;                  
+  containerNo: string;
+  containerId: number | null;
+  vehicleType: string;
+  vehicleNo: string;
+  ngayKhoiHanh: string;           
+  eta: string;                
+  status: string;
 }
 
 export interface Cargo {
@@ -84,4 +88,14 @@ export interface AppDB {
   contracts: Contract[];
   invoices: Invoice[];
   finance: Finance[];
+  vehicles: Vehicle[];
+}
+
+export interface Vehicle {
+  PhuongTienID: number;        
+  LoaiPhuongTien: string;       
+  BienSo: string;          
+  TaiTrong: number;               
+  TrangThai: string;              
+  MoTa: string | null;            
 }

@@ -10,7 +10,8 @@ const INITIAL_DB: AppDB = {
   staff: [],
   contracts: [],
   invoices: [],
-  finance: []
+  finance: [],
+  vehicles: []
 };
 
 export const useDB = () => {

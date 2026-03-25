@@ -12,8 +12,14 @@ const CARGO_SELECT_QUERY = `
     h.TenHang AS [desc],
     h.SoLuong AS qty,
     h.DonVi AS unit,
-    ISNULL(c.SoContainer, 'N/A') AS containerNo,
-    h.ContainerID AS containerID
+    ISNULL(c.SoContainer, '-') AS container, 
+    h.ContainerID AS containerID,
+    -- Phân loại hàng hiển thị trên cột 'Loại' ở FE
+    CASE 
+      WHEN h.TenHang LIKE N'%đông lạnh%' OR c.LoaiContainer = 'REEFER' THEN 'Reefer'
+      WHEN h.TenHang LIKE N'%Linh kiện%' OR h.TenHang LIKE N'%OLED%' THEN 'Dangerous (DG)'
+      ELSE 'General'
+    END AS [type]
   FROM HangHoa h
   LEFT JOIN Container c ON h.ContainerID = c.ContainerID
 `;
@@ -29,21 +35,23 @@ const getAllCargo = async (_req, res) => {
 };
 exports.getAllCargo = getAllCargo;
 const createCargo = async (req, res) => {
-    const { desc, qty, unit, containerID } = req.body;
+    const { tenHang, soLuong, donVi, containerID } = req.body;
     try {
         const pool = await (0, db_1.connectDB)();
         const insertResult = await pool.request()
-            .input('tenHang', mssql_1.default.NVarChar(255), desc)
-            .input('soLuong', mssql_1.default.Decimal(10, 2), qty)
-            .input('donVi', mssql_1.default.NVarChar(50), unit)
-            .input('containerID', mssql_1.default.Int, containerID)
+            .input('tenHang', mssql_1.default.NVarChar(255), tenHang)
+            .input('soLuong', mssql_1.default.Decimal(10, 2), soLuong)
+            .input('donVi', mssql_1.default.NVarChar(50), donVi || 'Kiện')
+            .input('containerID', mssql_1.default.Int, containerID || null)
             .query(`
         INSERT INTO HangHoa (TenHang, SoLuong, DonVi, ContainerID)
         OUTPUT INSERTED.HangHoaID AS id
         VALUES (@tenHang, @soLuong, @donVi, @containerID)
       `);
         const newId = insertResult.recordset[0].id;
-        const result = await pool.request().input('id', mssql_1.default.Int, newId).query(`${CARGO_SELECT_QUERY} WHERE h.HangHoaID = @id`);
+        const result = await pool.request()
+            .input('id', mssql_1.default.Int, newId)
+            .query(`${CARGO_SELECT_QUERY} WHERE h.HangHoaID = @id`);
         res.status(201).json(result.recordset[0]);
     }
     catch (err) {
@@ -53,15 +61,15 @@ const createCargo = async (req, res) => {
 exports.createCargo = createCargo;
 const updateCargo = async (req, res) => {
     const id = Number(req.params.id);
-    const { desc, qty, unit, containerID } = req.body;
+    const { tenHang, soLuong, donVi, containerID } = req.body;
     try {
         const pool = await (0, db_1.connectDB)();
         await pool.request()
             .input('id', mssql_1.default.Int, id)
-            .input('tenHang', mssql_1.default.NVarChar(255), desc)
-            .input('soLuong', mssql_1.default.Decimal(10, 2), qty)
-            .input('donVi', mssql_1.default.NVarChar(50), unit)
-            .input('containerID', mssql_1.default.Int, containerID)
+            .input('tenHang', mssql_1.default.NVarChar(255), tenHang)
+            .input('soLuong', mssql_1.default.Decimal(10, 2), soLuong)
+            .input('donVi', mssql_1.default.NVarChar(50), donVi)
+            .input('containerID', mssql_1.default.Int, containerID || null)
             .query(`
         UPDATE HangHoa SET
           TenHang = ISNULL(@tenHang, TenHang),
@@ -70,7 +78,9 @@ const updateCargo = async (req, res) => {
           ContainerID = @containerID
         WHERE HangHoaID = @id
       `);
-        const result = await pool.request().input('id', mssql_1.default.Int, id).query(`${CARGO_SELECT_QUERY} WHERE h.HangHoaID = @id`);
+        const result = await pool.request()
+            .input('id', mssql_1.default.Int, id)
+            .query(`${CARGO_SELECT_QUERY} WHERE h.HangHoaID = @id`);
         res.status(200).json(result.recordset[0]);
     }
     catch (err) {
@@ -82,11 +92,16 @@ const deleteCargo = async (req, res) => {
     const id = Number(req.params.id);
     try {
         const pool = await (0, db_1.connectDB)();
-        await pool.request().input('id', mssql_1.default.Int, id).query('DELETE FROM HangHoa WHERE HangHoaID = @id');
-        res.status(200).json({ message: 'Xóa thành công' });
+        const result = await pool.request()
+            .input('id', mssql_1.default.Int, id)
+            .query('DELETE FROM HangHoa WHERE HangHoaID = @id');
+        if (result.rowsAffected[0] === 0) {
+            return res.status(404).json({ message: 'Không tìm thấy hàng hóa để xóa' });
+        }
+        res.status(200).json({ message: 'Xóa hàng hóa thành công' });
     }
     catch (err) {
-        res.status(500).json({ message: 'Lỗi xóa hàng hóa', error: err.message });
+        res.status(500).json({ message: 'Lỗi khi xóa hàng hóa', error: err.message });
     }
 };
 exports.deleteCargo = deleteCargo;

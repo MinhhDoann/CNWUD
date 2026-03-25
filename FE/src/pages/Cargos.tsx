@@ -8,7 +8,7 @@ type CargoApiItem = Cargo & {
   loaiHangID?: number | null;
 };
 
-const CargoPage: React.FC = () => {
+const Cargos: React.FC = () => {
   const [cargoList, setCargoList] = useState<CargoApiItem[]>([]);
   const [containers, setContainers] = useState<Container[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -268,4 +268,4 @@ const CargoPage: React.FC = () => {
   );
 };
 
-export default CargoPage;
+export default Cargos;

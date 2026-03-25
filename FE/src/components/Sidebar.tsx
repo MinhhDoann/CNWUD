@@ -15,6 +15,7 @@ const menuItems = [
   { id: "invoices", label: "Hóa đơn" },
   { id: "partners", label: "Khách hàng & Đối tác" },
   { id: "staff", label: "Nhân sự" },
+  { id: "vehicles", label: "Phương tiện" },
 ];
 
 class Sidebar extends React.Component<Props> {
