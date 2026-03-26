@@ -1,4 +1,3 @@
-// Chuyển dữ liệu từ localStorage
 import { useState, useEffect } from 'react';
 import { AppDB } from './types';
 
@@ -22,7 +21,7 @@ export const useDB = () => {
 
   const saveDB = (newDB: AppDB) => {
     localStorage.setItem('cl_db', JSON.stringify(newDB));
-    setDb(newDB);        // ← tự động cập nhật UI
+    setDb(newDB);        
   };
 
   return { db, saveDB };

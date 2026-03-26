@@ -27,19 +27,20 @@ export interface Cargo {
 }
 
 export interface Partner {
-  id: number;
-  name: string;
-  type: string;        
-  contact: string;      
-  status: string;       
+  id: number;                    
+  name: string;                 
+  type: string;               
+  contact: string;               
+  address?: string;           
+  status: string;                
 }
 
 export interface Staff {
-  id: number;
-  name: string;
-  role: string;         
-  contact: string;
-  status: string;      
+  id: number;                  
+  username: string;              
+  fullName: string;            
+  email: string;               
+  status: string;             
 }
 
 export interface Contract {

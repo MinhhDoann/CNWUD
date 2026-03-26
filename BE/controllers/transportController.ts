@@ -9,9 +9,9 @@ const TRANSPORT_SELECT_QUERY = `
     c.MaChuyen AS ref,
     ISNULL(con.SoContainer, 'N/A') AS containerNo,
     con.ContainerID AS containerId,
-    ISNULL(p.LoaiPhuongTien, 'Không xác định') AS vehicleType,
+    ISNULL(p.LoaiPhuongTien, N'Không xác định') AS vehicleType,
     ISNULL(p.BienSo, 'N/A') AS vehicleNo,
-    FORMAT(c.NgayKhoiHanh, 'yyyy-MM-dd') AS ngayKhoiHanh,      -- ← THÊM
+    FORMAT(c.NgayKhoiHanh, 'yyyy-MM-dd') AS ngayKhoiHanh,
     FORMAT(c.NgayDuKienDen, 'yyyy-MM-dd') AS eta,
     ISNULL(c.TrangThai, N'Chuẩn bị') AS status
   FROM ChuyenDi c
@@ -23,9 +23,11 @@ export const getAllTransports = async (_req: Request, res: Response) => {
   try {
     const pool = await connectDB();
     const result = await pool.request().query(`${TRANSPORT_SELECT_QUERY} ORDER BY c.ChuyenDiID DESC`);
+    
+    console.log(`✅ Lấy ${result.recordset.length} lịch trình vận tải`);
     res.status(200).json(result.recordset);
   } catch (err: any) {
-    console.error(err);
+    console.error('getAllTransports error:', err);
     res.status(500).json({ 
       message: 'Lỗi lấy danh sách lịch trình vận tải', 
       error: err.message 
@@ -34,7 +36,7 @@ export const getAllTransports = async (_req: Request, res: Response) => {
 };
 
 export const createTransport = async (req: Request, res: Response) => {
-  const { ref, containerId, vehicleId, ngayKhoiHanh, eta, status } = req.body;
+  const { ref, containerId, vehicleId, ngayKhoiHanh, eta, status = 'Chuẩn bị' } = req.body; 
 
   if (!ref || !containerId || !vehicleId || !ngayKhoiHanh || !eta) {
     return res.status(400).json({ 
@@ -51,9 +53,10 @@ export const createTransport = async (req: Request, res: Response) => {
       .input('vehicleId', sql.Int, vehicleId)
       .input('ngayKhoiHanh', sql.Date, ngayKhoiHanh)
       .input('eta', sql.Date, eta)
-      .input('status', sql.NVarChar(50), status || 'Chuẩn bị')
+      .input('status', sql.NVarChar(50), status)
       .query(`
-        INSERT INTO ChuyenDi (MaChuyen, ContainerID, PhuongTienID, NgayKhoiHanh, NgayDuKienDen, TrangThai)
+        INSERT INTO ChuyenDi 
+          (MaChuyen, ContainerID, PhuongTienID, NgayKhoiHanh, NgayDuKienDen, TrangThai)
         OUTPUT INSERTED.ChuyenDiID AS id
         VALUES (@ref, @containerId, @vehicleId, @ngayKhoiHanh, @eta, @status)
       `);
@@ -66,7 +69,7 @@ export const createTransport = async (req: Request, res: Response) => {
 
     res.status(201).json(result.recordset[0]);
   } catch (err: any) {
-    console.error(err);
+    console.error('createTransport error:', err);
     res.status(500).json({ 
       message: 'Lỗi tạo lịch trình vận tải', 
       error: err.message 
@@ -86,7 +89,7 @@ export const updateTransport = async (req: Request, res: Response) => {
       .query('SELECT ChuyenDiID FROM ChuyenDi WHERE ChuyenDiID = @id');
 
     if (existing.recordset.length === 0) {
-      return res.status(404).json({ message: 'Không tìm thấy lịch trình' });
+      return res.status(404).json({ message: 'Không tìm thấy lịch trình vận tải' });
     }
 
     await pool.request()
@@ -115,7 +118,7 @@ export const updateTransport = async (req: Request, res: Response) => {
 
     res.status(200).json(result.recordset[0]);
   } catch (err: any) {
-    console.error(err);
+    console.error('updateTransport error:', err);
     res.status(500).json({ 
       message: 'Lỗi cập nhật lịch trình vận tải', 
       error: err.message 
@@ -128,15 +131,11 @@ export const deleteTransport = async (req: Request, res: Response) => {
 
   try {
     const pool = await connectDB();
-    const result = await pool.request()
+    await pool.request()
       .input('id', sql.Int, id)
       .query('DELETE FROM ChuyenDi WHERE ChuyenDiID = @id');
 
-    if (result.rowsAffected[0] === 0) {
-      return res.status(404).json({ message: 'Không tìm thấy lịch trình để xóa' });
-    }
-
-    res.status(200).json({ message: 'Xóa lịch trình thành công' });
+    res.status(200).json({ message: 'Xóa lịch trình vận tải thành công' });
   } catch (err: any) {
     res.status(500).json({ 
       message: 'Lỗi khi xóa lịch trình vận tải', 

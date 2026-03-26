@@ -1,7 +1,8 @@
 import React from "react";
 
 import Sidebar from "./components/Sidebar";
-
+import Staffs from "./pages/Staff";
+import Partners from "./pages/Partners";
 import Dashboard from "./pages/Dashboard";
 import Containers from "./pages/Containers";
 import Cargos from "./pages/Cargos";
@@ -33,7 +34,10 @@ class App extends React.Component {
             {this.state.activeSection === "containers" && <Containers />}
             {this.state.activeSection === "cargo" && <Cargos />}
             {this.state.activeSection === "transport" && <Transport />}
+            {this.state.activeSection === "contracts" && <div>Hợp đồng</div>}
             {this.state.activeSection === "finance" && <Finance />}
+            {this.state.activeSection === "partners" && <Partners />}
+            {this.state.activeSection === "staff" && <Staffs />}
             {this.state.activeSection === "vehicles" && <Vehicles />}
           </main>
         </div>
