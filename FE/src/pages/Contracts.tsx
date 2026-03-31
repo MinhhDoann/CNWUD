@@ -5,16 +5,89 @@ const API_BASE = 'http://localhost:5000/api';
 
 const Contracts: React.FC = () => {
   const [contracts, setContracts] = useState<Contract[]>([]);
-  const [partners, setPartners] = useState<any[]>([]); 
+  const [partners, setPartners] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [cNo, setCNo] = useState<string>('');
   const [cPartnerId, setCPartnerId] = useState<string>('');
   const [cStart, setCStart] = useState<string>('');
   const [cEnd, setCEnd] = useState<string>('');
-  const [cType, setCType] = useState<string>('');         
-  const [cValue, setCValue] = useState<number>(0);          
-  const [cStatus, setCStatus] = useState<string>('Chờ ký');
+  const [cType, setCType] = useState<string>('');           
+  const [cValue, setCValue] = useState<number>(0);        
+  const [cStatus, setCStatus] = useState<string>('Chờ ký'); 
   const [cNote, setCNote] = useState<string>('');          
+  const [editingId, setEditingId] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetchContracts();
+    fetchPartners();
+  }, []);
+
+  const fetchContracts = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${API_BASE}/contracts`);
+      if (!res.ok) throw new Error('Lỗi server');
+      const data: Contract[] = await res.json();
+      setContracts(data || []);
+    } catch (err) {
+      console.error('Lỗi tải danh sách hợp đồng:', err);
+      alert('Không thể tải danh sách hợp đồng');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchPartners = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/partners`);
+      const data = await res.json();
+      setPartners(data || []);
+    } catch (err) {
+      console.error('Lỗi tải danh sách đối tác:', err);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!cNo.trim() || !cPartnerId || !cStart) {
+      alert('Vui lòng nhập đầy đủ: Số hợp đồng, Đối tác và Ngày ký!');
+      return;
+    }
+
+    const payload = {
+      no: cNo.trim(),
+      partnerId: Number(cPartnerId),
+      start: cStart,
+      end: cEnd || null,
+      type: cType.trim() || null,        // LoaiDichVu
+      value: Number(cValue),
+      status: cStatus,
+      note: cNote.trim() || null,        // GhiChu
+    };
+
+    try {
+      const url = editingId 
+        ? `${API_BASE}/contracts/${editingId}`
+        : `${API_BASE}/contracts`;
+
+      const response = await fetch(url, {
+        method: editingId ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.message || 'Lưu thất bại');
+      }
+
+      alert(editingId ? 'Cập nhật hợp đồng thành công!' : 'Tạo hợp đồng mới thành công!');
+      await fetchContracts();
+      handleClear();
+    } catch (err: any) {
+      console.error(err);
+      alert(err.message || 'Có lỗi khi lưu hợp đồng');
+    }
+  };
 
   return (
     <div className="grid" style={{ gridTemplateColumns: '2fr 1fr', gap: '20px' }}>
