@@ -58,10 +58,10 @@ const Contracts: React.FC = () => {
       partnerId: Number(cPartnerId),
       start: cStart,
       end: cEnd || null,
-      type: cType.trim() || null,        // LoaiDichVu
+      type: cType.trim() || null,      
       value: Number(cValue),
       status: cStatus,
-      note: cNote.trim() || null,        // GhiChu
+      note: cNote.trim() || null,       
     };
 
     try {
