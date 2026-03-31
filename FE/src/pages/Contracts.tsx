@@ -1,4 +1,12 @@
-import React from "react";
+import React, { useEffect, useState } from 'react';
+import { Contract } from '../types';
+
+const API_BASE = 'http://localhost:5000/api';
+
+const Contracts: React.FC = () => {
+  const [contracts, setContracts] = useState<Contract[]>([]);
+  const [partners, setPartners] = useState<any[]>([]); // danh sách KhachHang
+  const [loading, setLoading] = useState(true);
 
 class Contracts extends React.Component {
   render() {
