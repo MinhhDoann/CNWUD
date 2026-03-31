@@ -175,7 +175,7 @@ const TransportPage: React.FC = () => {
                   <td>
                     <span style={{
                       padding: '4px 12px',
-                      borderRadius: '9999px',
+                      borderRadius: '99px',
                       fontSize: '13px',
                       backgroundColor: t.status === 'Đang đi' ? '#22c55e' : 
                                       t.status === 'Hoàn thành' ? '#3b82f6' : '#eab308',

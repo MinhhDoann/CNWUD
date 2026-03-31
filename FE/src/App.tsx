@@ -9,7 +9,7 @@ import Cargos from "./pages/Cargos";
 import Transport from "./pages/Transport";
 import Finance from "./pages/Finance";
 import Vehicles from "./pages/Vehicles";
-
+import Contracts from "./pages/Contracts";
 
 class App extends React.Component {
   state = {
@@ -34,7 +34,7 @@ class App extends React.Component {
             {this.state.activeSection === "containers" && <Containers />}
             {this.state.activeSection === "cargo" && <Cargos />}
             {this.state.activeSection === "transport" && <Transport />}
-            {this.state.activeSection === "contracts" && <div>Hợp đồng</div>}
+            {this.state.activeSection === "contracts" && <Contracts />}
             {this.state.activeSection === "finance" && <Finance />}
             {this.state.activeSection === "partners" && <Partners />}
             {this.state.activeSection === "staff" && <Staffs />}
