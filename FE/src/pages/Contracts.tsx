@@ -89,6 +89,41 @@ const Contracts: React.FC = () => {
     }
   };
 
+  const handleEdit = (c: Contract) => {
+    setCNo(c.no);
+    setCPartnerId(c.partnerId ? String(c.partnerId) : '');
+    setCStart(c.start);
+    setCEnd(c.end || '');
+    setCType(c.type || '');
+    setCValue(c.value);
+    setCStatus(c.status);
+    setCNote(c.note || '');
+    setEditingId(c.id);
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!window.confirm('Xóa hợp đồng này?')) return;
+
+    try {
+      await fetch(`${API_BASE}/contracts/${id}`, { method: 'DELETE' });
+      await fetchContracts();
+    } catch (err) {
+      alert('Xóa thất bại');
+    }
+  };
+
+  const handleClear = () => {
+    setCNo('');
+    setCPartnerId('');
+    setCStart('');
+    setCEnd('');
+    setCType('');
+    setCValue(0);
+    setCStatus('Chờ ký');
+    setCNote('');
+    setEditingId(null);
+  };
+
   return (
     <div className="grid" style={{ gridTemplateColumns: '2fr 1fr', gap: '20px' }}>
       {/* Danh sách hợp đồng */}
