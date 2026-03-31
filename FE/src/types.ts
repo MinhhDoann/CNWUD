@@ -44,14 +44,16 @@ export interface Staff {
 }
 
 export interface Contract {
-  id: number;
-  no: string;           
-  partner: string;
-  start: string;
-  end: string;
-  value: number;
-  status: string;      
-  note?: string;
+  id: number;                  
+  no: string;                  
+  partner: string;             
+  partnerId: number;             
+  start: string;               
+  end: string | null;         
+  type: string | null;           
+  value: number;               
+  status: string;              
+  note: string | null;        
 }
 
 export interface Invoice {
