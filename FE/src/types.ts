@@ -8,13 +8,13 @@ export interface Container {
 
 export interface Transport {
   id: number;
-  ref: string;                  
+  ref: string;
   containerNo: string;
   containerId: number | null;
   vehicleType: string;
   vehicleNo: string;
-  ngayKhoiHanh: string;           
-  eta: string;                
+  ngayKhoiHanh: string;
+  eta: string;
   status: string;
 }
 
