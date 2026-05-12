@@ -18,7 +18,7 @@ class Invoices extends React.Component {
                 <th>Hạn TT</th>
                 <th>Tổng tiền</th>
                 <th>Trạng thái</th>
-                <th>Thao tác</th>
+                <th>Hành động</th>
               </tr>
             </thead>
             <tbody>
