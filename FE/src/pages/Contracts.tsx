@@ -1,16 +1,5 @@
 import React, { useEffect, useState } from 'react';
-
-interface Contract {
-  id: number;
-  no: string;
-  partner: string;
-  partnerId: number;
-  start: string;
-  end?: string;
-  type: string;
-  status: string;
-  note?: string;
-}
+import { Contract } from '../types';
 
 const API_BASE = 'http://localhost:5000/api';
 
