@@ -55,6 +55,7 @@ const Contracts: React.FC = () => {
     }
 
     const payload = {
+      no: cNo.trim(),
       partnerId: Number(cPartnerId),
       start: cStart,
       end: cEnd || null,

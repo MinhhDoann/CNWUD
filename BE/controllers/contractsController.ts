@@ -5,7 +5,7 @@ import { connectDB } from '../config/db';
 const CONTRACT_SELECT_QUERY = `
   SELECT 
     h.HopDongID AS id,
-    CAST(h.HopDongID AS VARCHAR(20)) AS no,
+    h.SoHopDong AS no,
     ISNULL(kh.TenKH, N'Không xác định') AS partner,
     kh.KhachHangID AS partnerId,
     h.NgayKy AS start,
@@ -36,6 +36,7 @@ export const getAllContracts = async (_req: Request, res: Response) => {
 
 export const createContract = async (req: Request, res: Response) => {
   const { 
+    no,
     partnerId, 
     start, 
     end = null, 
@@ -44,8 +45,8 @@ export const createContract = async (req: Request, res: Response) => {
     note = null 
   } = req.body;
 
-  if (!partnerId || !start) {
-    return res.status(400).json({ message: 'Thiếu partnerId hoặc ngày ký' });
+  if (!no || !partnerId || !start) {
+    return res.status(400).json({ message: 'Thiếu số hợp đồng, đối tác hoặc ngày ký' });
   }
 
   try {
@@ -53,15 +54,16 @@ export const createContract = async (req: Request, res: Response) => {
 
     const insertResult = await pool
       .request()
+      .input('soHopDong', sql.NVarChar(50), no)
       .input('khachHangID', sql.Int, Number(partnerId))
       .input('ngayKy', sql.Date, start)
       .input('ngayHetHan', sql.Date, end)
       .input('loaiDichVu', sql.NVarChar(100), type)
       .input('trangThai', sql.NVarChar(50), status)
       .query(`
-        INSERT INTO HopDong (KhachHangID, NgayKy, NgayHetHan, LoaiDichVu, TrangThai)
+        INSERT INTO HopDong (SoHopDong, KhachHangID, NgayKy, NgayHetHan, LoaiDichVu, TrangThai)
         OUTPUT INSERTED.HopDongID AS id
-        VALUES (@khachHangID, @ngayKy, @ngayHetHan, @loaiDichVu, @trangThai)
+        VALUES (@soHopDong, @khachHangID, @ngayKy, @ngayHetHan, @loaiDichVu, @trangThai)
       `);
 
     const newId = insertResult.recordset[0].id;
@@ -82,7 +84,7 @@ export const createContract = async (req: Request, res: Response) => {
 
 export const updateContract = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
-  const { partnerId, start, end, type, status } = req.body;
+  const { no, partnerId, start, end, type, status } = req.body;
 
   try {
     const pool = await connectDB();
@@ -99,6 +101,7 @@ export const updateContract = async (req: Request, res: Response) => {
 
     await pool.request()
       .input('id', sql.Int, id)
+      .input('soHopDong', sql.NVarChar(50), no ?? current.SoHopDong)
       .input('khachHangID', sql.Int, partnerId ? Number(partnerId) : current.KhachHangID)
       .input('ngayKy', sql.Date, start ?? current.NgayKy)
       .input('ngayHetHan', sql.Date, end !== undefined ? end : current.NgayHetHan)
@@ -107,6 +110,7 @@ export const updateContract = async (req: Request, res: Response) => {
       .query(`
         UPDATE HopDong
         SET 
+          SoHopDong = @soHopDong,
           KhachHangID = @khachHangID,
           NgayKy = @ngayKy,
           NgayHetHan = @ngayHetHan,
