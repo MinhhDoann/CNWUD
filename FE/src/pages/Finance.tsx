@@ -71,7 +71,7 @@ const FinancePage: React.FC = () => {
       }
 
       setResultMessage('Đã lưu chi phí thành công!');
-      
+
       // Refresh the list and reset form
       fetchFinances();
       setSelectedContainerId('');
@@ -151,16 +151,16 @@ const FinancePage: React.FC = () => {
                   <td>{f.extra.toLocaleString('vi-VN')} đ</td>
                   <td style={{ fontWeight: 'bold', color: '#ef4444' }}>{f.total.toLocaleString('vi-VN')} đ</td>
                   <td>
-                    <button 
-                      className="btn" 
-                      style={{ background: '#3b82f6', padding: '4px 8px', fontSize: '12px', marginRight: '6px' }}
+                    <button
+                      className="btn"
+                      style={{ background: '#3b82f6', marginRight: '6px' }}
                       onClick={() => handleEdit(f)}
                     >
                       Sửa
                     </button>
-                    <button 
-                      className="btn" 
-                      style={{ background: '#ef4444', padding: '4px 8px', fontSize: '12px' }}
+                    <button
+                      className="btn"
+                      style={{ background: '#ef4444' }}
                       onClick={() => handleDelete(f.id)}
                     >
                       Xóa
@@ -176,9 +176,9 @@ const FinancePage: React.FC = () => {
       <div className="card">
         <h3>Tính toán chi phí</h3>
         <div className="form-row">
-          <select 
-            id="fSelectContainer" 
-            value={selectedContainerId} 
+          <select
+            id="fSelectContainer"
+            value={selectedContainerId}
             onChange={e => setSelectedContainerId(e.target.value)}
           >
             <option value="">- Chọn Container cần tính -</option>
@@ -188,37 +188,37 @@ const FinancePage: React.FC = () => {
           </select>
         </div>
         <div className="form-row">
-          <input 
-            id="fBase" 
-            type="number" 
-            placeholder="Cước cơ bản (VND)" 
+          <input
+            id="fBase"
+            type="number"
+            placeholder="Cước cơ bản (VND)"
             value={base}
             onChange={e => setBase(e.target.value)}
           />
         </div>
         <div className="form-row">
-          <input 
-            id="fDemDet" 
-            type="number" 
-            placeholder="Phí DEM/DET (VND)" 
+          <input
+            id="fDemDet"
+            type="number"
+            placeholder="Phí DEM/DET (VND)"
             value={demdet}
             onChange={e => setDemdet(e.target.value)}
           />
         </div>
         <div className="form-row">
-          <input 
-            id="fLocal" 
-            type="number" 
-            placeholder="Phí Local/Seal (VND)" 
+          <input
+            id="fLocal"
+            type="number"
+            placeholder="Phí Local/Seal (VND)"
             value={local}
             onChange={e => setLocal(e.target.value)}
           />
         </div>
         <div className="form-row">
-          <input 
-            id="fExtra" 
-            type="number" 
-            placeholder="Phí phát sinh (VND)" 
+          <input
+            id="fExtra"
+            type="number"
+            placeholder="Phí phát sinh (VND)"
             value={extra}
             onChange={e => setExtra(e.target.value)}
           />

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Container } from '../types'; 
+import { Container } from '../types';
 
-const API_BASE = 'http://localhost:5000/api'; 
+const API_BASE = 'http://localhost:5000/api';
 
 const Containers: React.FC = () => {
   const [containers, setContainers] = useState<Container[]>([]);
