@@ -26,6 +26,7 @@ interface DashboardStats {
 const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchStats();
@@ -34,12 +35,17 @@ const Dashboard: React.FC = () => {
   const fetchStats = async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await fetch(`${API_BASE}/dashboard`);
-      if (!response.ok) throw new Error("Failed to fetch stats");
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.message || "Failed to fetch stats");
+      }
       const data = await response.json();
       setStats(data);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error fetching dashboard stats:", err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -56,8 +62,16 @@ const Dashboard: React.FC = () => {
     return <div className="content">Đang tải dữ liệu tổng quan...</div>;
   }
 
-  if (!stats) {
-    return <div className="content">Không thể tải dữ liệu.</div>;
+  if (error || !stats) {
+    return (
+      <div className="content">
+        <div className="card" style={{ border: '1px solid #fee2e2', background: '#fef2f2', color: '#991b1b' }}>
+          <h3>Không thể tải dữ liệu</h3>
+          <p>{error || "Đã có lỗi xảy ra khi kết nối tới máy chủ."}</p>
+          <button className="btn" style={{ marginTop: '15px' }} onClick={fetchStats}>Thử lại</button>
+        </div>
+      </div>
+    );
   }
 
   const transitPercent = stats.containers.total > 0 

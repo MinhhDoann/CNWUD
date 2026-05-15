@@ -11,36 +11,63 @@ import Finance from "./pages/Finance";
 import Vehicles from "./pages/Vehicles";
 import Contracts from "./pages/Contracts";
 import Invoices from "./pages/Invoices";
+import Login from "./pages/Login";
 
 class App extends React.Component {
   state = {
-    activeSection: "dashboard"
+    activeSection: "dashboard",
+    isLoggedIn: false,
+    userRole: ""
   };
 
   changeSection = (section: string) => {
     this.setState({ activeSection: section });
   };
 
+  handleLogin = (role: string) => {
+    this.setState({
+      isLoggedIn: true,
+      userRole: role,
+      activeSection: "dashboard"
+    });
+  };
+
+  handleLogout = () => {
+    this.setState({ isLoggedIn: false, userRole: "" });
+  };
+
   render() {
+    const { isLoggedIn, activeSection } = this.state;
+
+    if (!isLoggedIn) {
+      return <Login onLogin={this.handleLogin} />;
+    }
+
     return (
       <div className="app">
         <div className="main-layout">
-          <Sidebar 
-            activeSection={this.state.activeSection} 
-            onChange={this.changeSection} 
+          <Sidebar
+            activeSection={activeSection}
+            onChange={this.changeSection}
           />
 
           <main className="content">
-            {this.state.activeSection === "dashboard" && <Dashboard />}
-            {this.state.activeSection === "containers" && <Containers />}
-            {this.state.activeSection === "cargo" && <Cargos />}
-            {this.state.activeSection === "transport" && <Transport />}
-            {this.state.activeSection === "contracts" && <Contracts />}
-            {this.state.activeSection === "invoices" && <Invoices />}
-            {this.state.activeSection === "finance" && <Finance />}
-            {this.state.activeSection === "partners" && <Partners />}
-            {this.state.activeSection === "staff" && <Staffs />}
-            {this.state.activeSection === "vehicles" && <Vehicles />}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
+              <button onClick={this.handleLogout} className="btn" style={{ background: '#64748b' }}>
+                Đăng xuất
+              </button>
+            </div>
+
+            {activeSection === "dashboard" && <Dashboard />}
+            {activeSection === "containers" && <Containers />}
+            {activeSection === "cargo" && <Cargos />}
+            {activeSection === "transport" && <Transport />}
+            {activeSection === "contracts" && <Contracts />}
+            {activeSection === "invoices" && <Invoices />}
+            {activeSection === "finance" && <Finance />}
+            {activeSection === "partners" && <Partners />}
+            {activeSection === "staff" && <Staffs />}
+            {activeSection === "vehicles" && <Vehicles />}
           </main>
         </div>
       </div>
