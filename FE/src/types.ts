@@ -30,7 +30,8 @@ export interface Partner {
   id: number;                    
   name: string;                 
   type: string;               
-  contact: string;               
+  phone: string;
+  email: string;
   address?: string;           
   status: string;                
 }

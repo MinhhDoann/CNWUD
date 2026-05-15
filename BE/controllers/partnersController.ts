@@ -8,7 +8,8 @@ const PARTNER_SELECT_QUERY = `
     KhachHangID AS id,
     TenKH AS name,
     LoaiDoiTac AS type,
-    ISNULL(SDT, '') + ' | ' + ISNULL(Email, '') AS contact,
+    ISNULL(SDT, '') AS phone,
+    ISNULL(Email, '') AS email,
     DiaChi AS address,
     TrangThai AS status
   FROM KhachHang
@@ -26,7 +27,7 @@ export const getAllPartners = async (_req: Request, res: Response) => {
 };
 
 export const createPartner = async (req: Request, res: Response) => {
-  const { tenKH, loaiDoiTac, sdt, diaChi, trangThai = 'Hoạt động' } = req.body;
+  const { tenKH, loaiDoiTac, sdt, email, diaChi, trangThai = 'Hoạt động' } = req.body;
 
   if (!tenKH) {
     return res.status(400).json({ message: 'Thiếu tên đối tác/khách hàng' });
@@ -36,15 +37,16 @@ export const createPartner = async (req: Request, res: Response) => {
     const pool = await connectDB();
 
     const insertResult = await pool.request()
-      .input('tenKH', sql.NVarChar(150), tenKH)
-      .input('loaiDoiTac', sql.NVarChar(50), loaiDoiTac || 'Khách hàng')
-      .input('sdt', sql.NVarChar(20), sdt || null)
-      .input('diaChi', sql.NVarChar(200), diaChi || null)
+      .input('tenKH', sql.NVarChar(200), tenKH)
+      .input('loaiDoiTac', sql.NVarChar(100), loaiDoiTac || 'Khách hàng')
+      .input('sdt', sql.NVarChar(100), sdt || null)
+      .input('email', sql.NVarChar(100), email || null)
+      .input('diaChi', sql.NVarChar(500), diaChi || null)
       .input('trangThai', sql.NVarChar(50), trangThai)
       .query(`
-        INSERT INTO KhachHang (TenKH, LoaiDoiTac, SDT, DiaChi, TrangThai)
-        OUTPUT INSERTED.KhachHangID AS id
-        VALUES (@tenKH, @loaiDoiTac, @sdt, @diaChi, @trangThai)
+        INSERT INTO KhachHang (TenKH, LoaiDoiTac, SDT, Email, DiaChi, TrangThai)
+        VALUES (@tenKH, @loaiDoiTac, @sdt, @email, @diaChi, @trangThai);
+        SELECT SCOPE_IDENTITY() AS id;
       `);
 
     const newId = insertResult.recordset[0].id;
@@ -62,7 +64,7 @@ export const createPartner = async (req: Request, res: Response) => {
 
 export const updatePartner = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
-  const { tenKH, loaiDoiTac, sdt, diaChi, trangThai } = req.body;
+  const { tenKH, loaiDoiTac, sdt, email, diaChi, trangThai } = req.body;
 
   try {
     const pool = await connectDB();
@@ -77,10 +79,11 @@ export const updatePartner = async (req: Request, res: Response) => {
 
     await pool.request()
       .input('id', sql.Int, id)
-      .input('tenKH', sql.NVarChar(150), tenKH)
-      .input('loaiDoiTac', sql.NVarChar(50), loaiDoiTac)
-      .input('sdt', sql.NVarChar(20), sdt)
-      .input('diaChi', sql.NVarChar(200), diaChi)
+      .input('tenKH', sql.NVarChar(200), tenKH)
+      .input('loaiDoiTac', sql.NVarChar(100), loaiDoiTac)
+      .input('sdt', sql.NVarChar(100), sdt)
+      .input('email', sql.NVarChar(100), email)
+      .input('diaChi', sql.NVarChar(500), diaChi)
       .input('trangThai', sql.NVarChar(50), trangThai)
       .query(`
         UPDATE KhachHang
@@ -88,6 +91,7 @@ export const updatePartner = async (req: Request, res: Response) => {
           TenKH = @tenKH,
           LoaiDoiTac = @loaiDoiTac,
           SDT = @sdt,
+          Email = @email,
           DiaChi = @diaChi,
           TrangThai = @trangThai
         WHERE KhachHangID = @id

@@ -11,7 +11,8 @@ const Partners: React.FC = () => {
   // Form state
   const [pName, setPName] = useState<string>('');
   const [pType, setPType] = useState<string>('Khách hàng');
-  const [pContact, setPContact] = useState<string>('');
+  const [pPhone, setPPhone] = useState<string>('');
+  const [pEmail, setPEmail] = useState<string>('');
   const [pAddress, setPAddress] = useState<string>('');
   const [pStatus, setPStatus] = useState<string>('Hoạt động');
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -36,15 +37,16 @@ const Partners: React.FC = () => {
   };
 
   const handleSave = async () => {
-    if (!pName.trim() || !pContact.trim()) {
-      alert('Vui lòng nhập Tên và Thông tin liên hệ!');
+    if (!pName.trim()) {
+      alert('Vui lòng nhập Tên đối tác!');
       return;
     }
 
     const payload = {
       tenKH: pName.trim(),
       loaiDoiTac: pType,
-      sdt: pContact.trim(),
+      sdt: pPhone.trim(),
+      email: pEmail.trim(),
       diaChi: pAddress.trim() || null,
       trangThai: pStatus,
     };
@@ -66,7 +68,10 @@ const Partners: React.FC = () => {
         });
       }
 
-      if (!response.ok) throw new Error('Lưu thất bại');
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.message || 'Lưu thất bại');
+      }
 
       alert(editingId ? 'Cập nhật đối tác thành công!' : 'Thêm đối tác thành công!');
       await fetchPartners();
@@ -79,7 +84,8 @@ const Partners: React.FC = () => {
   const handleEdit = (partner: Partner) => {
     setPName(partner.name);
     setPType(partner.type);
-    setPContact(partner.contact);
+    setPPhone(partner.phone);
+    setPEmail(partner.email);
     setPAddress(partner.address || '');
     setPStatus(partner.status);
     setEditingId(partner.id);
@@ -99,7 +105,8 @@ const Partners: React.FC = () => {
   const handleClear = () => {
     setPName('');
     setPType('Khách hàng');
-    setPContact('');
+    setPPhone('');
+    setPEmail('');
     setPAddress('');
     setPStatus('Hoạt động');
     setEditingId(null);
@@ -115,7 +122,8 @@ const Partners: React.FC = () => {
               <th>#</th>
               <th>Tên</th>
               <th>Loại</th>
-              <th>Liên hệ</th>
+              <th>Điện thoại</th>
+              <th>Email</th>
               <th>Địa chỉ</th>
               <th>Trạng thái</th>
               <th>Hành động</th>
@@ -123,19 +131,20 @@ const Partners: React.FC = () => {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={7} style={{ textAlign: 'center', color: '#94a3b8' }}>Đang tải...</td></tr>
+              <tr><td colSpan={8} style={{ textAlign: 'center', color: '#94a3b8' }}>Đang tải...</td></tr>
             ) : partners.length === 0 ? (
-              <tr><td colSpan={7} style={{ textAlign: 'center', color: '#94a3b8' }}>Chưa có đối tác / khách hàng</td></tr>
+              <tr><td colSpan={8} style={{ textAlign: 'center', color: '#94a3b8' }}>Chưa có đối tác / khách hàng</td></tr>
             ) : (
               partners.map((p, index) => (
                 <tr key={p.id}>
                   <td>{index + 1}</td>
                   <td><strong>{p.name}</strong></td>
                   <td>{p.type}</td>
-                  <td>{p.contact}</td>
+                  <td>{p.phone || '-'}</td>
+                  <td>{p.email || '-'}</td>
                   <td>{p.address || '-'}</td>
                   <td>
-                    <span 
+                    <span
                       style={{
                         padding: '6px 12px',
                         borderRadius: '20px',
@@ -149,16 +158,16 @@ const Partners: React.FC = () => {
                     </span>
                   </td>
                   <td>
-                    <button 
-                      className="btn" 
-                      style={{ background: '#3b82f6', marginRight: '8px', padding: '6px 12px' }} 
+                    <button
+                      className="btn"
+                      style={{ background: "#3b82f6", marginRight: "6px" }}
                       onClick={() => handleEdit(p)}
                     >
                       Sửa
                     </button>
-                    <button 
-                      className="btn" 
-                      style={{ background: '#ef4444', padding: '6px 12px' }} 
+                    <button
+                      className="btn"
+                      style={{ background: "#ef4444" }}
                       onClick={() => handleDelete(p.id)}
                     >
                       Xóa
@@ -175,10 +184,10 @@ const Partners: React.FC = () => {
         <h3>{editingId ? 'Sửa Đối tác / Khách hàng' : 'Thêm Đối tác / Khách hàng'}</h3>
 
         <div className="form-row">
-          <input 
-            placeholder="Tên đối tác / khách hàng" 
-            value={pName} 
-            onChange={e => setPName(e.target.value)} 
+          <input
+            placeholder="Tên đối tác / khách hàng"
+            value={pName}
+            onChange={e => setPName(e.target.value)}
           />
         </div>
 
@@ -191,19 +200,24 @@ const Partners: React.FC = () => {
           </select>
         </div>
 
-        <div className="form-row">
-          <input 
-            placeholder="SĐT / Email liên hệ" 
-            value={pContact} 
-            onChange={e => setPContact(e.target.value)} 
+        <div className="form-row-2">
+          <input
+            placeholder="Số điện thoại"
+            value={pPhone}
+            onChange={e => setPPhone(e.target.value)}
+          />
+          <input
+            placeholder="Email"
+            value={pEmail}
+            onChange={e => setPEmail(e.target.value)}
           />
         </div>
 
         <div className="form-row">
-          <input 
-            placeholder="Địa chỉ (tùy chọn)" 
-            value={pAddress} 
-            onChange={e => setPAddress(e.target.value)} 
+          <input
+            placeholder="Địa chỉ (tùy chọn)"
+            value={pAddress}
+            onChange={e => setPAddress(e.target.value)}
           />
         </div>
 
@@ -218,9 +232,9 @@ const Partners: React.FC = () => {
           <button className="btn" onClick={handleSave}>
             {editingId ? 'Cập nhật' : 'Lưu'}
           </button>
-          <button 
-            className="btn" 
-            style={{ background: '#6b7280' }} 
+          <button
+            className="btn"
+            style={{ background: '#6b7280' }}
             onClick={handleClear}
           >
             Hủy
